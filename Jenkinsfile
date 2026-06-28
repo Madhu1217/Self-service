@@ -17,7 +17,7 @@ pipeline {
         ECR_REPOSITORY = 'self-service-portal'
 
         SONARQUBE_SERVER = 'sonarqube'
-        GITOPS_REPO = 'git@github.com:your-org/ssp-gitops.git'
+        GITOPS_REPO = 'git@github.com:Madhu1217/Self-service.git'
         GITOPS_CREDENTIALS_ID = 'gitops-ssh-key'
         GITOPS_BRANCH = 'main'
         GITOPS_APP_PATH = 'apps/self-service-portal'
