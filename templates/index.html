@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Services | Self Service Portal{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <p class="eyebrow">Operations intake</p>
+        <h1>Self Service Portal</h1>
+        <p class="hero-copy">Submit environment, CAB, deployment, batch, and support requests from one production-ready Flask application.</p>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading">
+        <h2>Available Services</h2>
+        <a class="text-link" href="{{ url_for('requests_list') }}">View all requests</a>
+    </div>
+    <div class="service-grid">
+        {% for key, service in services.items() %}
+            <a class="service-card" href="{{ url_for('service_form', service_key=key) }}">
+                <h3>{{ service.title }}</h3>
+                <p>{{ service.description }}</p>
+                <span>Open request</span>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="section-heading">
+        <h2>Recent Requests</h2>
+    </div>
+    {% if recent_requests %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Service</th>
+                        <th>Requester</th>
+                        <th>Environment</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in recent_requests %}
+                        <tr>
+                            <td><a href="{{ url_for('request_detail', request_id=item.id) }}">#{{ item.id }}</a></td>
+                            <td>{{ item.service_name }}</td>
+                            <td>{{ item.requester or "-" }}</td>
+                            <td>{{ item.environment or "-" }}</td>
+                            <td><span class="status">{{ item.status }}</span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-state">No requests submitted yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

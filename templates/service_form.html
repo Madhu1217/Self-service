@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}{{ service.title }} | Self Service Portal{% endblock %}
+
+{% block content %}
+<section class="form-layout">
+    <div class="form-intro">
+        <p class="eyebrow">New request</p>
+        <h1>{{ service.title }}</h1>
+        <p>{{ service.description }}</p>
+    </div>
+
+    <form class="request-form" method="post" data-cost-form="{{ 'true' if service.show_cost else 'false' }}">
+        {% for field in service.fields %}
+            <div class="form-field">
+                <label for="{{ field.name }}">{{ field.label }}</label>
+
+                {% if field.type == "textarea" %}
+                    <textarea id="{{ field.name }}" name="{{ field.name }}" rows="5" {% if field.required %}required{% endif %}>{{ request.form.get(field.name, '') }}</textarea>
+                {% elif field.type == "select" %}
+                    <select id="{{ field.name }}" name="{{ field.name }}" {% if field.required %}required{% endif %}>
+                        <option value="">Select</option>
+                        {% for option in field.options %}
+                            <option value="{{ option }}" {% if request.form.get(field.name) == option %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                {% elif field.type == "environment" %}
+                    <select id="{{ field.name }}" name="{{ field.name }}" data-cost-environment {% if field.required %}required{% endif %}>
+                        <option value="">Select environment</option>
+                        {% for env in environments %}
+                            <option value="{{ env }}" data-daily-cost="{{ environment_costs[env] }}" {% if request.form.get(field.name) == env %}selected{% endif %}>{{ env }}</option>
+                        {% endfor %}
+                    </select>
+                {% elif field.type == "mainframe_environment" %}
+                    <select id="{{ field.name }}" name="{{ field.name }}" data-mainframe-environment {% if field.required %}required{% endif %}>
+                        <option value="">Select environment type first</option>
+                    </select>
+                {% else %}
+                    <input id="{{ field.name }}" name="{{ field.name }}" type="{{ field.type }}" value="{{ request.form.get(field.name, '') }}" {% if field.required %}required{% endif %}>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        {% if service.show_cost %}
+            <div class="cost-panel" data-cost-panel>
+                <span>Estimated Cost</span>
+                <strong data-cost-display>Choose dates and environment</strong>
+                <small>DEVE, DEVD, DEVF: INR 20,000 per 24 hours. Others: INR 15,000 per 24 hours.</small>
+            </div>
+        {% endif %}
+
+        <div class="form-actions">
+            <a class="button secondary" href="{{ url_for('index') }}">Cancel</a>
+            <button class="button primary" type="submit">Submit Request</button>
+        </div>
+    </form>
+</section>
+
+<script>
+    window.SSP_ENVIRONMENTS = {
+        production: {{ production_environments | tojson }},
+        test: {{ test_environments | tojson }},
+        selected: {{ request.form.get('environment', '') | tojson }}
+    };
+</script>
+{% endblock %}

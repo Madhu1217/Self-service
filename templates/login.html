@@ -1,0 +1,33 @@
+{% extends "base.html" %} {% block title %}Login | Self Service Portal{%
+endblock %} {% block content %}
+<section class="auth-layout">
+  <div class="auth-panel">
+    <p class="eyebrow">Secure access</p>
+    <h1>Login</h1>
+    <form class="request-form auth-form" method="post">
+      <div class="form-field">
+        <label for="username_or_email">Username Or Email</label>
+        <input
+          id="username_or_email"
+          name="username_or_email"
+          type="text"
+          required
+        />
+      </div>
+      <div class="form-field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" required />
+      </div>
+      <div class="form-actions">
+        <a class="button secondary" href="{{ url_for('signup') }}"
+          >Create Account</a
+        >
+        <button class="button primary" type="submit">Login</button>
+      </div>
+    </form>
+    <p class="helper-text">
+      Please create <strong>Account</strong>, if you don't have.
+    </p>
+  </div>
+</section>
+{% endblock %}

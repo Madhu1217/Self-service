@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: self-service-portal
+  namespace: ssp
+  labels:
+    app: self-service-portal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: self-service-portal
+  template:
+    metadata:
+      labels:
+        app: self-service-portal
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+        - name: self-service-portal
+          image: your-registry.example.com/self-service-portal:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ssp-secret
+                  key: SECRET_KEY
+            - name: DATABASE_URL
+              value: sqlite:////app/instance/ssp.db
+            - name: ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: ssp-secret
+                  key: ADMIN_USERNAME
+            - name: ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: ssp-secret
+                  key: ADMIN_EMAIL
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ssp-secret
+                  key: ADMIN_PASSWORD
+            - name: SMTP_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: ssp-secret
+                  key: SMTP_HOST
+            - name: SMTP_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: ssp-secret
+                  key: SMTP_PORT
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ssp-secret
+                  key: SMTP_USER
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ssp-secret
+                  key: SMTP_PASSWORD
+            - name: SMTP_FROM
+              valueFrom:
+                secretKeyRef:
+                  name: ssp-secret
+                  key: SMTP_FROM
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: sqlite-data
+              mountPath: /app/instance
+      volumes:
+        - name: sqlite-data
+          persistentVolumeClaim:
+            claimName: ssp-sqlite-pvc

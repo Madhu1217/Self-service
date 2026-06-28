@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Admin | Self Service Portal{% endblock %}
+
+{% block content %}
+<section class="section-block">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Admin console</p>
+            <h1>All Requests</h1>
+        </div>
+        <a class="button primary" href="{{ url_for('admin_export') }}">Export For Excel</a>
+    </div>
+
+    <form class="email-form" method="post" action="{{ url_for('admin_email') }}">
+        <div class="form-field">
+            <label for="recipient">Email Export To</label>
+            <input id="recipient" name="recipient" type="email" placeholder="operations@example.com" required>
+        </div>
+        <button class="button primary" type="submit">Send Email</button>
+    </form>
+
+    {% if service_requests %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Service</th>
+                        <th>User</th>
+                        <th>Requester</th>
+                        <th>Environment</th>
+                        <th>Cost</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in service_requests %}
+                        <tr>
+                            <td><a href="{{ url_for('request_detail', request_id=item.id) }}">#{{ item.id }}</a></td>
+                            <td>{{ item.service_name }}</td>
+                            <td>{{ item.user.username if item.user else "-" }}</td>
+                            <td>{{ item.requester or "-" }}</td>
+                            <td>{{ item.environment or "-" }}</td>
+                            <td>{% if item.calculated_cost %}INR {{ "{:,}".format(item.calculated_cost) }}{% else %}-{% endif %}</td>
+                            <td><span class="status">{{ item.status }}</span></td>
+                            <td>{{ item.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-state">No requests submitted yet.</p>
+    {% endif %}
+</section>
+
+<section class="section-block">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Users</p>
+            <h2>Registered Accounts</h2>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Created</th>
+                    <th>Password Reset</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>#{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role }}</td>
+                        <td>{{ user.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+                        <td>
+                            <form class="inline-form" method="post" action="{{ url_for('admin_reset_password', user_id=user.id) }}">
+                                <button class="button secondary" type="submit">Reset And Email</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="helper-text">Admins cannot see passwords. Reset creates a temporary password, stores only its hash, and emails the password directly to the user.</p>
+</section>
+{% endblock %}

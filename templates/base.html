@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Self Service Portal{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header class="app-header">
+        <a class="brand" href="{{ url_for('index') }}">Self Service Portal</a>
+        <nav class="nav-links" aria-label="Primary">
+            {% if current_user %}
+                <a href="{{ url_for('index') }}">Services</a>
+                <a href="{{ url_for('requests_list') }}">Requests</a>
+                <a href="{{ url_for('settings') }}">Settings</a>
+                {% if current_user.is_admin %}
+                    <a href="{{ url_for('admin_dashboard') }}">Admin</a>
+                {% endif %}
+                <form id="logout-form" class="logout-form" method="post" action="{{ url_for('logout') }}">
+                    <button type="submit">Logout</button>
+                </form>
+                <form id="timeout-form" class="hidden-form" method="post" action="{{ url_for('session_timeout') }}"></form>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+                <a href="{{ url_for('signup') }}">Create Account</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="page-shell">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <section class="flash-stack" aria-live="polite">
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if current_user %}
+        <script>
+            window.SSP_SESSION_TIMEOUT_MS = 10 * 60 * 1000;
+        </script>
+    {% endif %}
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

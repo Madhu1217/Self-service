@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Request #{{ service_request.id }} | Self Service Portal{% endblock %}
+
+{% block content %}
+<section class="detail-layout">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">{{ service_request.service_name }}</p>
+            <h1>Request #{{ service_request.id }}</h1>
+        </div>
+        <span class="status">{{ service_request.status }}</span>
+    </div>
+
+    <dl class="detail-grid">
+        <div><dt>Requester</dt><dd>{{ service_request.requester or "-" }}</dd></div>
+        <div><dt>Application</dt><dd>{{ service_request.application or "-" }}</dd></div>
+        <div><dt>Environment Type</dt><dd>{{ service_request.environment_type or "-" }}</dd></div>
+        <div><dt>Environment</dt><dd>{{ service_request.environment or "-" }}</dd></div>
+        <div><dt>Start Date</dt><dd>{{ service_request.start_date or "-" }}</dd></div>
+        <div><dt>End Date</dt><dd>{{ service_request.end_date or "-" }}</dd></div>
+        <div><dt>Outage</dt><dd>{{ service_request.outage or "-" }}</dd></div>
+        <div><dt>SME Details</dt><dd>{{ service_request.sme_details or "-" }}</dd></div>
+        <div><dt>Cost</dt><dd>{% if service_request.calculated_cost %}INR {{ "{:,}".format(service_request.calculated_cost) }}{% else %}-{% endif %}</dd></div>
+        <div><dt>Created</dt><dd>{{ service_request.created_at.strftime("%Y-%m-%d %H:%M") }}</dd></div>
+        <div class="wide"><dt>Short Summary</dt><dd>{{ service_request.short_summary or "-" }}</dd></div>
+        <div class="wide"><dt>Description</dt><dd>{{ service_request.description or "-" }}</dd></div>
+        <div class="wide"><dt>Environment Impact</dt><dd>{{ service_request.environment_impact or "-" }}</dd></div>
+        <div class="wide"><dt>Problem</dt><dd>{{ service_request.problem or "-" }}</dd></div>
+    </dl>
+
+    <div class="form-actions">
+        <a class="button secondary" href="{{ url_for('requests_list') }}">Back To Requests</a>
+        <a class="button primary" href="{{ url_for('index') }}">New Request</a>
+    </div>
+</section>
+{% endblock %}
